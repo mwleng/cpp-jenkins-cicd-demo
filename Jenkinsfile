@@ -39,6 +39,7 @@ pipeline {
             }
         }
         stage('Publish GitHub release') {
+            agent { label 'ubuntu' }            
             when {
                 branch 'main'
             }
