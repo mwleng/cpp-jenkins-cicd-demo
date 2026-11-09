@@ -1,12 +1,23 @@
 #include "filecheck/checker.hpp"
 
 #include <cassert>
+#include <chrono>
 #include <filesystem>
 #include <fstream>
+#include <string>
 
 int main() {
-    const auto test_root = std::filesystem::temp_directory_path() / "cpp-filecheck-test";
-    std::filesystem::remove_all(test_root);
+    const auto unique_suffix =
+        std::chrono::steady_clock::now().time_since_epoch().count();
+
+    const auto test_root =
+        std::filesystem::temp_directory_path() /
+        ("cpp-filecheck-test-" + std::to_string(unique_suffix));
+
+    std::error_code error;
+    std::filesystem::remove_all(test_root, error);
+    assert(!error);
+
     std::filesystem::create_directories(test_root / "directory");
     std::ofstream(test_root / "sample.txt") << "sample\n";
 
@@ -16,7 +27,8 @@ int main() {
     assert(filecheck::to_string(filecheck::CheckResult::file) == "file");
     assert(filecheck::to_string(filecheck::CheckResult::missing) == "missing");
 
-    std::filesystem::remove_all(test_root);
+    std::filesystem::remove_all(test_root, error);
+    assert(!error);
     return 0;
 }
 
