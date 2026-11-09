@@ -1,0 +1,10 @@
+/build/
+/dist/
+/.cache/
+*.deb
+*.rpm
+*.tar.gz
+*.zip
+.idea/
+.vscode/
+
