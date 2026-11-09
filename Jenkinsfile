@@ -45,7 +45,7 @@ pipeline {
             steps {
                 withCredentials([
                     string(
-                        credentialsId: 'github-release-token',
+                        credentialsId: 'github-release-token-secret',
                         variable: 'GH_TOKEN'
                     )
                 ]) {
