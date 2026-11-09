@@ -40,7 +40,7 @@ pipeline {
         }
         stage('Publish GitHub release') {
             when {
-                buildingTag()
+                branch 'main'
             }
             steps {
                 withCredentials([
