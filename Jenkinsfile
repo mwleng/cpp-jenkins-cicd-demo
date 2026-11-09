@@ -54,11 +54,11 @@ pipeline {
             }
             steps {
                 script {
-                    // def releaseTag = env.TAG_NAME ?: env.BRANCH_NAME
+                    def releaseTag = env.TAG_NAME ?: env.BRANCH_NAME
 
-                    // if (!releaseTag?.startsWith('v')) {
-                    //     error("Release requires a v* tag build; TAG_NAME=${env.TAG_NAME}, BRANCH_NAME=${env.BRANCH_NAME}")
-                    // }
+                    if (!releaseTag?.startsWith('v')) {
+                        error("Release requires a v* tag build; TAG_NAME=${env.TAG_NAME}, BRANCH_NAME=${env.BRANCH_NAME}")
+                    }
                     unstash 'release-packages'
 
                     withCredentials([
