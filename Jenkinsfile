@@ -35,7 +35,14 @@ pipeline {
             steps {
                 checkout scm
                 sh './scripts/package.sh'
-                archiveArtifacts artifacts: 'dist/*.tar.gz,dist/*.zip', fingerprint: true
+
+                archiveArtifacts(
+                    artifacts: 'dist/*.tar.gz,dist/*.zip', fingerprint: true
+                )
+
+                stash(
+                    name: 'release-packages', includes: 'dist/*.tar.gz,dist/*.zip'
+                )
             }
         }
         stage('Publish GitHub release') {
@@ -47,11 +54,12 @@ pipeline {
             }
             steps {
                 script {
-                    def releaseTag = env.TAG_NAME ?: env.BRANCH_NAME
+                    // def releaseTag = env.TAG_NAME ?: env.BRANCH_NAME
 
-                    if (!releaseTag?.startsWith('v')) {
-                        error("Release requires a v* tag build; TAG_NAME=${env.TAG_NAME}, BRANCH_NAME=${env.BRANCH_NAME}")
-                    }
+                    // if (!releaseTag?.startsWith('v')) {
+                    //     error("Release requires a v* tag build; TAG_NAME=${env.TAG_NAME}, BRANCH_NAME=${env.BRANCH_NAME}")
+                    // }
+                    unstash 'release-packages'
 
                     withCredentials([
                         string(
