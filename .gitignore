@@ -7,4 +7,5 @@
 *.zip
 .idea/
 .vscode/
+/build-*/
 
