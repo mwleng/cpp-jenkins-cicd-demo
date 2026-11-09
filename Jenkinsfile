@@ -40,7 +40,7 @@ pipeline {
         }
         stage('Publish GitHub release') {
             when {
-                tag pattern: 'v*', comparator: 'GLOB'
+                branch 'main'
             }
             steps {
                 withCredentials([
