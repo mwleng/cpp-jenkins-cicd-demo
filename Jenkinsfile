@@ -38,6 +38,27 @@ pipeline {
                 archiveArtifacts artifacts: 'dist/*', fingerprint: true
             }
         }
+        stage('Publish GitHub release') {
+            when {
+                buildingTag()
+            }
+            steps {
+                withCredentials([
+                    string(
+                        credentialsId: 'github-release-token',
+                        variable: 'GH_TOKEN'
+                    )
+                ]) {
+                    sh '''
+                        set -eu
+                        gh release create "$TAG_NAME" dist/* \
+                            --repo mwleng/cpp-jenkins-cicd-demo \
+                            --verify-tag \
+                            --generate-notes
+                    '''
+                }
+            }
+        }        
     }
 }
 
