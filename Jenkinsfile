@@ -35,7 +35,7 @@ pipeline {
             steps {
                 checkout scm
                 sh './scripts/package.sh'
-                archiveArtifacts artifacts: 'dist/*', fingerprint: true
+                archiveArtifacts artifacts: 'dist/*.tar.gz,dist/*.zip', fingerprint: true
             }
         }
         stage('Publish GitHub release') {
@@ -62,7 +62,7 @@ pipeline {
                         withEnv(["RELEASE_TAG=${releaseTag}"]) {
                             sh '''
                                 set -eu
-                                gh release create "$RELEASE_TAG" dist/* \
+                                gh release create "$RELEASE_TAG" dist/*.tar.gz dist/*.zip \
                                     --repo mwleng/cpp-jenkins-cicd-demo \
                                     --verify-tag \
                                     --generate-notes
