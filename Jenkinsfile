@@ -39,26 +39,39 @@ pipeline {
             }
         }
         stage('Publish GitHub release') {
+            agent {
+                label 'ubuntu'
+            }
             when {
-                branch 'main'
+                tag pattern: 'v*', comparator: 'GLOB'
             }
             steps {
-                withCredentials([
-                    string(
-                        credentialsId: 'github-release-token-secret',
-                        variable: 'GH_TOKEN'
-                    )
-                ]) {
-                    sh '''
-                        set -eu
-                        gh release create "$TAG_NAME" dist/* \
-                            --repo mwleng/cpp-jenkins-cicd-demo \
-                            --verify-tag \
-                            --generate-notes
-                    '''
+                script {
+                    def releaseTag = env.TAG_NAME ?: env.BRANCH_NAME
+
+                    if (!releaseTag?.startsWith('v')) {
+                        error("Release requires a v* tag build; TAG_NAME=${env.TAG_NAME}, BRANCH_NAME=${env.BRANCH_NAME}")
+                    }
+
+                    withCredentials([
+                        string(
+                            credentialsId: 'github-release-token-secret',
+                            variable: 'GH_TOKEN'
+                        )
+                    ]) {
+                        withEnv(["RELEASE_TAG=${releaseTag}"]) {
+                            sh '''
+                                set -eu
+                                gh release create "$RELEASE_TAG" dist/* \
+                                    --repo mwleng/cpp-jenkins-cicd-demo \
+                                    --verify-tag \
+                                    --generate-notes
+                            '''
+                        }
+                    }
                 }
             }
-        }        
+        }      
     }
 }
 
